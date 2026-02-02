@@ -1,0 +1,7 @@
+name: ItemRepair
+version: 0.1.0
+main: org.allaymc.itemrepair.ItemRepairPlugin
+api-version: 0.24.0
+description: A plugin that allows players to repair damaged items and tools using experience levels.
+author: atri-0110
+website: https://github.com/atri-0110/ItemRepair
