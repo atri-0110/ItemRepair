@@ -4,22 +4,24 @@ import org.allaymc.api.command.Command;
 import org.allaymc.api.command.CommandResult;
 import org.allaymc.api.command.CommandSender;
 import org.allaymc.api.command.tree.CommandTree;
+import org.allaymc.api.container.Container;
+import org.allaymc.api.container.ContainerTypes;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.item.ItemStack;
-import org.allaymc.api.item.interfaces.ItemAirStack;
+import org.allaymc.api.item.type.ItemTypes;
 import org.allaymc.itemrepair.ItemRepairPlugin;
 import org.allaymc.itemrepair.manager.RepairManager;
 
 /**
  * Command handler for /repair.
- * Allows players to repair the item they're holding.
+ * Allows players to repair item they're holding.
  */
 public class RepairCommand extends Command {
 
     private final RepairManager repairManager;
 
     public RepairCommand(RepairManager repairManager) {
-        super("repair", "Repair the item in your hand", "itemrepair.use");
+        super("repair", "Repair item in your hand", "itemrepair.use");
         this.repairManager = repairManager;
     }
 
@@ -41,10 +43,11 @@ public class RepairCommand extends Command {
                         return context.fail();
                     }
 
-                    // Get item in hand
-                    ItemStack item = player.getContainer(org.allaymc.api.container.ContainerTypes.HAND).getItemStack(0);
+                    // Get item in hand (main hand is slot 0 in inventory)
+                    Container inventory = player.getContainer(ContainerTypes.INVENTORY);
+                    ItemStack item = inventory.getItemStack(0);
 
-                    if (item == null || item.getItemType() instanceof ItemAirStack) {
+                    if (item == null || item.getItemType() == ItemTypes.AIR) {
                         ItemRepairPlugin.sendMessage(player,
                                 "§cYou're not holding any item!");
                         return context.fail();
@@ -74,29 +77,15 @@ public class RepairCommand extends Command {
                         return context.fail();
                     }
 
-                    // Repair the item
-                    ItemStack repairedItem = item.getItemType().createItemStack(
-                            org.allaymc.api.item.type.ItemStackInitInfo.builder()
-                                    .count(item.getCount())
-                                    .meta(0) // Reset damage
-                                    .extraTag(item.getExtraTag())
-                                    .build()
-                    );
+                    // Repair item by resetting damage (meta) to 0
+                    item.setMeta(0);
 
-                    if (repairedItem != null) {
-                        // Remove XP
-                        player.setExperienceLevel(playerLevel - cost);
+                    // Remove XP
+                    player.setExperienceLevel(playerLevel - cost);
 
-                        // Replace item in hand
-                        player.getContainer(org.allaymc.api.container.ContainerTypes.HAND).setItemStack(0, repairedItem);
-
-                        ItemRepairPlugin.sendMessage(player,
-                                String.format("§aItem repaired! §e%d §aexperience levels spent.", cost));
-                        return context.success();
-                    }
-
-                    ItemRepairPlugin.sendMessage(player, "§cFailed to repair item!");
-                    return context.fail();
+                    ItemRepairPlugin.sendMessage(player,
+                            String.format("§aItem repaired! §e%d §aexperience levels spent.", cost));
+                    return context.success();
                 });
 
         // /repair check - Check repair cost without repairing
@@ -109,9 +98,10 @@ public class RepairCommand extends Command {
                         return context.fail();
                     }
 
-                    ItemStack item = player.getContainer(org.allaymc.api.container.ContainerTypes.HAND).getItemStack(0);
+                    Container inventory = player.getContainer(ContainerTypes.INVENTORY);
+                    ItemStack item = inventory.getItemStack(0);
 
-                    if (item == null || item.getItemType() instanceof ItemAirStack) {
+                    if (item == null || item.getItemType() == ItemTypes.AIR) {
                         ItemRepairPlugin.sendMessage(player,
                                 "§cYou're not holding any item!");
                         return context.fail();

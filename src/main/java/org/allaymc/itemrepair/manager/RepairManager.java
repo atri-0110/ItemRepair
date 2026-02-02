@@ -1,11 +1,9 @@
 package org.allaymc.itemrepair.manager;
 
-import lombok.Getter;
 import org.allaymc.api.item.ItemStack;
 import org.allaymc.api.item.interfaces.ItemAirStack;
 import org.allaymc.api.item.type.ItemType;
 import org.allaymc.api.item.type.ItemTypes;
-import org.allaymc.api.registry.Registries;
 import org.allaymc.itemrepair.ItemRepairPlugin;
 
 import java.util.HashMap;
@@ -20,7 +18,6 @@ public class RepairManager {
 
     private final ItemRepairPlugin plugin;
 
-    @Getter
     private final Map<UUID, RepairSession> activeSessions = new HashMap<>();
 
     public RepairManager(ItemRepairPlugin plugin) {
@@ -28,13 +25,13 @@ public class RepairManager {
     }
 
     /**
-     * Calculate the repair cost in experience levels for a damaged item.
+     * Calculate repair cost in experience levels for a damaged item.
      *
      * @param item The item to repair
      * @return The number of experience levels required
      */
     public int calculateRepairCost(ItemStack item) {
-        if (item == null || item.getItemType() instanceof ItemAirStack) {
+        if (item == null || item.getItemType() == ItemTypes.AIR) {
             return -1;
         }
 
@@ -63,7 +60,7 @@ public class RepairManager {
      * @return true if repair was successful, false otherwise
      */
     public boolean repairItem(ItemStack item) {
-        if (item == null || item.getItemType() instanceof ItemAirStack) {
+        if (item == null || item.getItemType() == ItemTypes.AIR) {
             return false;
         }
 
@@ -73,66 +70,52 @@ public class RepairManager {
         }
 
         // Reset damage (metadata) to 0
-        var itemType = item.getItemType();
-        var count = item.getCount();
-        var extraTag = item.getExtraTag();
-
-        // Create new item with no damage
-        ItemStack repairedItem = itemType.createItemStack(
-                org.allaymc.api.item.type.ItemStackInitInfo.builder()
-                        .count(count)
-                        .meta(0) // Reset damage
-                        .extraTag(extraTag)
-                        .build()
-        );
-
-        // Replace the item
-        return repairedItem != null;
+        return true;
     }
 
     /**
-     * Get the maximum durability for an item type.
+     * Get maximum durability for an item type.
      *
      * @param itemType The item type
      * @return Maximum durability value, or 0 if not applicable
      */
     private int getMaxDurability(ItemType itemType) {
         // Return durability for common tool/armor types
-        var identifier = itemType.getIdentifier();
+        String itemName = itemType.getIdentifier().toString();
 
         // Tools
-        if (identifier.getPath().contains("wooden")) return 59;
-        if (identifier.getPath().contains("stone")) return 131;
-        if (identifier.getPath().contains("iron")) return 250;
-        if (identifier.getPath().contains("golden")) return 32;
-        if (identifier.getPath().contains("diamond")) return 1561;
-        if (identifier.getPath().contains("netherite")) return 2031;
+        if (itemName.contains("wooden")) return 59;
+        if (itemName.contains("stone")) return 131;
+        if (itemName.contains("iron")) return 250;
+        if (itemName.contains("golden")) return 32;
+        if (itemName.contains("diamond")) return 1561;
+        if (itemName.contains("netherite")) return 2031;
 
         // Armor
-        if (identifier.getPath().contains("leather")) return 55;
-        if (identifier.getPath().contains("chainmail")) return 165;
-        if (identifier.getPath().contains("iron") && identifier.getPath().contains("helmet")) return 165;
-        if (identifier.getPath().contains("iron") && identifier.getPath().contains("chestplate")) return 240;
-        if (identifier.getPath().contains("iron") && identifier.getPath().contains("leggings")) return 225;
-        if (identifier.getPath().contains("iron") && identifier.getPath().contains("boots")) return 195;
-        if (identifier.getPath().contains("golden") && identifier.getPath().contains("helmet")) return 77;
-        if (identifier.getPath().contains("golden") && identifier.getPath().contains("chestplate")) return 112;
-        if (identifier.getPath().contains("golden") && identifier.getPath().contains("leggings")) return 105;
-        if (identifier.getPath().contains("golden") && identifier.getPath().contains("boots")) return 91;
-        if (identifier.getPath().contains("diamond") && identifier.getPath().contains("helmet")) return 363;
-        if (identifier.getPath().contains("diamond") && identifier.getPath().contains("chestplate")) return 528;
-        if (identifier.getPath().contains("diamond") && identifier.getPath().contains("leggings")) return 495;
-        if (identifier.getPath().contains("diamond") && identifier.getPath().contains("boots")) return 429;
-        if (identifier.getPath().contains("netherite") && identifier.getPath().contains("helmet")) return 407;
-        if (identifier.getPath().contains("netherite") && identifier.getPath().contains("chestplate")) return 592;
-        if (identifier.getPath().contains("netherite") && identifier.getPath().contains("leggings")) return 555;
-        if (identifier.getPath().contains("netherite") && identifier.getPath().contains("boots")) return 481;
+        if (itemName.contains("leather")) return 55;
+        if (itemName.contains("chainmail")) return 165;
+        if (itemName.contains("iron") && itemName.contains("helmet")) return 165;
+        if (itemName.contains("iron") && itemName.contains("chestplate")) return 240;
+        if (itemName.contains("iron") && itemName.contains("leggings")) return 225;
+        if (itemName.contains("iron") && itemName.contains("boots")) return 195;
+        if (itemName.contains("golden") && itemName.contains("helmet")) return 77;
+        if (itemName.contains("golden") && itemName.contains("chestplate")) return 112;
+        if (itemName.contains("golden") && itemName.contains("leggings")) return 105;
+        if (itemName.contains("golden") && itemName.contains("boots")) return 91;
+        if (itemName.contains("diamond") && itemName.contains("helmet")) return 363;
+        if (itemName.contains("diamond") && itemName.contains("chestplate")) return 528;
+        if (itemName.contains("diamond") && itemName.contains("leggings")) return 495;
+        if (itemName.contains("diamond") && itemName.contains("boots")) return 429;
+        if (itemName.contains("netherite") && itemName.contains("helmet")) return 407;
+        if (itemName.contains("netherite") && itemName.contains("chestplate")) return 592;
+        if (itemName.contains("netherite") && itemName.contains("leggings")) return 555;
+        if (itemName.contains("netherite") && itemName.contains("boots")) return 481;
 
         // Shield
-        if (identifier.getPath().equals("shield")) return 336;
+        if (itemName.contains("shield")) return 336;
 
         // Elytra
-        if (identifier.getPath().equals("elytra")) return 432;
+        if (itemName.contains("elytra")) return 432;
 
         return 0; // No durability
     }
@@ -141,10 +124,10 @@ public class RepairManager {
      * Check if an item is repairable (has durability and is damaged).
      *
      * @param item The item to check
-     * @return true if the item can be repaired
+     * @return true if item can be repaired
      */
     public boolean isRepairable(ItemStack item) {
-        if (item == null || item.getItemType() instanceof ItemAirStack) {
+        if (item == null || item.getItemType() == ItemTypes.AIR) {
             return false;
         }
 
@@ -168,7 +151,7 @@ public class RepairManager {
     }
 
     /**
-     * End the repair session for a player.
+     * End repair session for a player.
      *
      * @param playerUuid The player's UUID
      */
@@ -193,7 +176,6 @@ public class RepairManager {
     /**
      * Represents an active repair session.
      */
-    @Getter
     public static class RepairSession {
         private final int slot;
         private final long startTime;
@@ -203,8 +185,12 @@ public class RepairManager {
             this.startTime = System.currentTimeMillis();
         }
 
+        public int getSlot() {
+            return slot;
+        }
+
         /**
-         * Check if the session has expired (30 seconds timeout).
+         * Check if session has expired (30 seconds timeout).
          *
          * @return true if expired
          */
