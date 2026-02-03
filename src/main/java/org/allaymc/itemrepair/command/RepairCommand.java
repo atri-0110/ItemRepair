@@ -77,8 +77,8 @@ public class RepairCommand extends Command {
                         return context.fail();
                     }
 
-                    // Repair item by resetting damage (meta) to 0
-                    item.setMeta(0);
+                    // Repair item by resetting damage to 0 using the proper API
+                    item.setDamage(0);
 
                     // Remove XP
                     player.setExperienceLevel(playerLevel - cost);

@@ -19,7 +19,7 @@ public class ItemRepairPlugin extends Plugin {
     public void onLoad() {
         instance = this;
         this.pluginLogger.info("ItemRepair is loading...");
-        this.repairManager = new RepairManager(this);
+        this.repairManager = new RepairManager();
     }
 
     @Override
@@ -33,9 +33,6 @@ public class ItemRepairPlugin extends Plugin {
     @Override
     public void onDisable() {
         this.pluginLogger.info("ItemRepair is disabling...");
-        if (repairManager != null) {
-            repairManager.shutdown();
-        }
         this.pluginLogger.info("ItemRepair disabled!");
     }
 
